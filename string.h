@@ -1,101 +1,66 @@
-#pragma once
-#include <cstddef>
-#include <iostream>
+#ifndef STRING_H__
+#define STRING_H__
+
+#include <string.h>
 #include <algorithm>
-#include <numeric>
 
-namespace MagicSTL {
-    class string {
-    public:
-        typedef char* iterator;
+namespace magicstl {
 
-    private:
-        char* m_pData;
-        size_t m_nSize;        // 长度
-        size_t m_nTotalSize;   // 容器大小
+class string {
+private:
+    char*  data_;
+    size_t size_;
+    size_t capacity_;
 
-    public:
-        string(const char* str = "");
-        string(string& s);
-        ~string();
-
-        void swap(string&);
-        string& operator=(string);
-        char& operator[](size_t index);
-        string& operator+(string& s);
-        char* c_str();
-        size_t size();
-        size_t capacity();
-        void reserve(size_t);
-        size_t find(char* str, size_t index);
-    };
-
-    /***********************************/
-
-    string::string(const char* str = "") : m_nSize(strlen(str)), m_nTotalSize(m_nSize) {
-        m_pData = new char(m_nTotalSize);
-        strcpy(m_pData, str);
+    unsigned short getlen(const char* str) {
+        unsigned short len = 0;
+        for (; str[len++]; );
+        return len;
     }
 
-    string::string(string& s) {
-        string temp(s.m_pData);   // 调用上面的构造函数
-        swap(temp);                    // 深度拷贝
-    }
+public:
+    string(const char* str = "");    // 通用构造函数
+    string(const string&);           // 拷贝构造函数
+    string& operator=(string&);
+    char& operator[](size_t index);
+    ~string();
 
-    string::~string() {
-        if (m_pData) {
-            delete [] m_pData;
-            m_pData = nullptr;
-            m_nSize = m_nTotalSize = 0;
-        }
-    }
+    void swap(string&);
+};
 
-    void string::swap(string& s) {
-        std::swap(m_pData, s.m_pData);
-        std::swap(m_nSize, s.m_nSize);
-        std::swap(m_nTotalSize, s.m_nTotalSize);
-    }
+string::string(const char* str = "") : size_(getlen(str)), capacity_(size_) {
+    data_ = new char[capacity_];
+    memcpy(data_, str, size_);          // 将 char* 字符串交给 string 类托管，向上一层封装
+}
 
-    string& string::operator=(string s) {
-        swap(s);
-        return *this;
-    }
+string::string(const string& str) {
+    string temp(str.data_);      // 调用通用构造函数
+    swap(temp);                  // 深拷贝
+}
 
-    char& string::operator[](size_t index) {
-        return m_pData[index];
+string::~string() {
+    if (data_) {
+        delete [] data_;
+        data_ = nullptr;
+        size_ = capacity_ = 0;
     }
+}
 
-    string& string::operator+(string &s) {
-        strcat(m_pData, s.c_str());
-        return *this;
-    }
+void string::swap(string& str) {
+    std::swap(data_, str.data_);
+    std::swap(size_, str.size_);
+    std::swap(capacity_, str.capacity_);
+}
 
-    char* string::c_str() {
-        return m_pData;
-    }
+string& string::operator=(string& str) {
+    swap(str);
+    return *this;
+}
 
-    size_t string::size() {
-        return m_nSize;
-    }
-
-    size_t string::capacity() {
-        return m_nTotalSize;
-    }
-
-    void string::reserve(size_t n) {      // 重新分配大小
-        if (n > m_nTotalSize) {
-            char* temp = new char(n +  1);
-            strcpy(temp, m_pData);
-            delete [] m_pData;
-            m_pData = temp;
-            m_nTotalSize = n;
-        }
-    }
-
-    size_t string::find(char* str, size_t index) {
-        char* p = strstr(m_pData + index, str);
-        if (p == nullptr) return -1;
-        else return p - str;
-    }
+char& string::operator[](size_t index) {
+    return data_[index];
+}
 
 }
+
+#endif // !STRING_H__
