@@ -98,6 +98,10 @@ public:
     bool operator>=(const string&) const;  // 判断是否大于等于
 };
 
+/* ******************************************************************************************* */
+/* **************************** Implementation of class member functions ********************* */
+/* ******************************************************************************************* */
+
 string::string(const char* str = "") : size_(getlen(str)), capacity_(size_) {
     data_ = new char[capacity_];
     memcpy(data_, str, size_);          // 将 char* 字符串交给 string 类托管，向上一层封装
