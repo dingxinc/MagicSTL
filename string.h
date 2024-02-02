@@ -33,25 +33,7 @@ public:
 
     void swap(string&);              // 深拷贝
 
-    size_t find(const char* str, size_t pos);  // 查找子串
-
-    size_t find_first_of(const char* str, size_t pos);  // 查找第一个字符
-
-    size_t find_last_of(const char* str, size_t pos);   // 查找最后一个字符
-
-    size_t find_first_not_of(const char* str, size_t pos);  // 查找第一个不在 str 中的字符
-
-    size_t find_last_not_of(const char* str, size_t pos);   // 查找最后一个不在 str 中的字符
-
-    size_t rfind(const char* str, size_t pos);  // 反向查找子串
-
-    size_t rfind_first_of(const char* str, size_t pos);  // 反向查找第一个字符
-
-    size_t rfind_last_of(const char* str, size_t pos);   // 反向查找最后一个字符
-
-    size_t rfind_first_not_of(const char* str, size_t pos);  // 反向查找第一个不在 str 中的字符
-
-    size_t rfind_last_not_of(const char* str, size_t pos);   // 反向查找最后一个不在 str 中的字符
+    size_t find(const char* str);  // 查找子串
 
     size_t count(const char* str, size_t pos, size_t n);  // 统计子串出现次数
 
@@ -96,13 +78,21 @@ public:
     bool operator>(const string&) const;  // 判断是否大于
 
     bool operator>=(const string&) const;  // 判断是否大于等于
+
+    string& operator<<(const string& str);  // 左移运算符
+
+    string& operator>>(string& str);  // 右移运算符
+
+    string& operator+=(const string& str);  // 加等于运算符
+
+    string& operator-=(const string& str);  // 减等于运算符
 };
 
 /* ******************************************************************************************* */
 /* **************************** Implementation of class member functions ********************* */
 /* ******************************************************************************************* */
 
-string::string(const char* str = "") : size_(getlen(str)), capacity_(size_) {
+string::string(const char* str) : size_(getlen(str)), capacity_(size_) {
     data_ = new char[capacity_];
     memcpy(data_, str, size_);          // 将 char* 字符串交给 string 类托管，向上一层封装
 }
@@ -147,99 +137,8 @@ char& string::operator[](size_t index) {
 }
 
 
-size_t string::find(const char* str, size_t pos) {
-    return strstr(data_ + pos, str) - data_;
-}
-
-
-size_t string::find_first_of(const char* str, size_t pos) {
-    return strpbrk(data_ + pos, str) - data_;
-}
-
-
-size_t string::find_last_of(const char* str, size_t pos) {
-    const char* p = data_ + pos;
-    const char* q = nullptr;
-    while ((p = strpbrk(p, str)) != nullptr) {
-        q = p;
-        ++p;
-    }
-    return q - data_;
-}
-
-
-size_t string::find_first_not_of(const char* str, size_t pos) {
-    const char* p = data_ + pos;
-    while (*p && strchr(str, *p)) {
-        ++p;
-    }
-    return p - data_;
-}
-
-
-size_t string::find_last_not_of(const char* str, size_t pos) {
-    const char* p = data_ + pos;
-    const char* q = nullptr;
-    while ((p = strchr(p, *p)) != nullptr) {
-        q = p;
-        ++p;
-    }
-    return q - data_;
-}
-
-
-size_t string::rfind(const char* str, size_t pos) {
-    const char* p = data_ + pos;
-    const char* q = nullptr;
-    while ((p = strstr(p, str)) != nullptr) {
-        q = p;
-        ++p;
-    }
-    return q - data_;
-}
-
-
-size_t string::rfind_first_of(const char* str, size_t pos) {
-    const char* p = data_ + pos;
-    const char* q = nullptr;
-    while ((p = strpbrk(p, str)) != nullptr) {
-        q = p;
-        ++p;
-    }
-    return q - data_;
-}
-
-
-size_t string::rfind_last_of(const char* str, size_t pos) {
-    const char* p = data_ + pos;
-    const char* q = nullptr;
-    while ((p = strpbrk(p, str)) != nullptr) {
-        q = p;
-        ++p;
-    }
-    return q - data_;
-}
-
-
-size_t string::rfind_first_not_of(const char* str, size_t pos) {
-    const char* p = data_ + pos;
-    const char* q = nullptr;
-    while ((p = strchr(p, *p)) != nullptr) {
-        q = p;
-        ++p;
-    }
-    return q - data_;
-}
-
-
-size_t string::rfind_last_not_of(const char* str, size_t pos) {
-    const char* p = data_ + pos;
-    const char* q = nullptr;
-    while ((p = strchr(p, *p)) != nullptr) {
-        q = p;
-        ++p;
-    }
-    return q - data_;
+size_t string::find(const char* str) {
+    return strstr(data_, str) - data_;
 }
 
 
@@ -270,13 +169,13 @@ const char* string::data() const {
 
 void string::resize(size_t new_size) {
     if (new_size > capacity_) {
-        char* new_data = new char[new_size];
-        memcpy(new_data, data_, size_);
-        delete [] data_;
-        data_ = new_data;
-        capacity_ = new_size;
+        char* new_data = new char[new_size];       // 扩容
+        memcpy(new_data, data_, size_);// 拷贝旧数据
+        delete [] data_;                           // 删除旧数据
+        data_ = new_data;                          // 指向新数据
+        capacity_ = new_size;                       // 更新容量
     }
-    size_ = new_size;
+    size_ = new_size;    // 更新长度
 }
 
 
@@ -287,7 +186,7 @@ void string::clear() {
 
 void string::push_back(char ch) {
     if (size_ == capacity_) {
-        resize(capacity_ * 2);
+        resize(capacity_ * 2);  // 扩容
     }
     data_[size_++] = ch;
 }
@@ -385,6 +284,50 @@ bool string::operator>(const string& str) const {
 bool string::operator>=(const string& str) const {
     return !(*this < str);
 }
+
+
+string& string::operator<<(const string& str) {
+    // insert(size_, str.data_, str.size_);
+    // return *this;    // 左移运算符返回左侧对象 
+    unsigned short len = getlen(str.data_);
+    if (size_ + len > capacity_) {
+        resize(size_ + len);
+    }
+    memcpy(data_ + size_, str.data_, len);
+    size_ += len;
+    return *this;
+}
+
+
+string& string::operator>>(string& str) {
+    // str = substr(0, size_);
+    // resize(0);
+    // return str;    // 右移运算符返回右侧对象
+    str = *this;
+    resize(0);
+    return str;
+}
+
+string& string::operator+=(const string& str) {
+    // insert(size_, str.data_, str.size_);
+    // return *this;    // 加等于运算符返回左侧对象
+    unsigned short len = getlen(str.data_);
+    if (size_ + len > capacity_) {   // 扩容
+        resize(size_ + len);
+    }
+    memcpy(data_ + size_, str.data_, len);   // 拷贝新数据
+    size_ += len;
+    return *this;   
+}
+
+
+string& string::operator-=(const string& str) {
+    size_t pos = find(str.data_);
+    if (pos != string::npos) {
+        erase(pos, str.size_);
+    }
+    return *this;
+}     
 
 }
 
