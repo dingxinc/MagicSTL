@@ -41,6 +41,7 @@ public:
     size_t count(const char* str, size_t pos, size_t n);  // 统计子串出现次数
 
     size_t size() const;  // 获取字符串长度
+    size_t capacity() const;  // 获取字符串容量
     const char* data() const;  // 获取字符串指针
     void resize(size_t new_size);  // 调整字符串长度
     void clear();  // 清空字符串
@@ -205,6 +206,10 @@ size_t string::count(const char* str, size_t pos, size_t n) {
 
 size_t string::size() const {
     return size_;
+}
+
+size_t string::capacity() const {
+    return capacity_;
 }
 
 
