@@ -19,7 +19,7 @@ private:
     }
 
 public:
-    string(const char* str = "");    // 通用构造函数
+    string(const char* str);    // 通用构造函数
 
     string(const char* str, size_t len);
 
