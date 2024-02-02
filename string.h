@@ -20,46 +20,81 @@ private:
 
 public:
     string(const char* str = "");    // 通用构造函数
+
     string(const char* str, size_t len);
+
     string(const string&);           // 拷贝构造函数
+
     string& operator=(string&);      // 赋值运算符
+
     ~string();
 
     char& operator[](size_t index);  // 下标运算符
 
     void swap(string&);              // 深拷贝
+
     size_t find(const char* str, size_t pos);  // 查找子串
+
     size_t find_first_of(const char* str, size_t pos);  // 查找第一个字符
+
     size_t find_last_of(const char* str, size_t pos);   // 查找最后一个字符
+
     size_t find_first_not_of(const char* str, size_t pos);  // 查找第一个不在 str 中的字符
+
     size_t find_last_not_of(const char* str, size_t pos);   // 查找最后一个不在 str 中的字符
+
     size_t rfind(const char* str, size_t pos);  // 反向查找子串
+
     size_t rfind_first_of(const char* str, size_t pos);  // 反向查找第一个字符
+
     size_t rfind_last_of(const char* str, size_t pos);   // 反向查找最后一个字符
+
     size_t rfind_first_not_of(const char* str, size_t pos);  // 反向查找第一个不在 str 中的字符
+
     size_t rfind_last_not_of(const char* str, size_t pos);   // 反向查找最后一个不在 str 中的字符
+
     size_t count(const char* str, size_t pos, size_t n);  // 统计子串出现次数
 
     size_t size() const;  // 获取字符串长度
+
     size_t capacity() const;  // 获取字符串容量
+
     const char* data() const;  // 获取字符串指针
+
     void resize(size_t new_size);  // 调整字符串长度
+
     void clear();  // 清空字符串
+
     void push_back(char ch);  // 追加字符
+
     void pop_back();  // 删除最后一个字符
+
     void assign(const char* str);  // 赋值字符串
+
     void insert(size_t pos, const char* str);  // 插入字符串
+
     void insert(size_t pos, const char* str, size_t len);  // 插入字符串
+
     void insert(size_t pos, char ch);  // 插入字符
+
     void erase(size_t pos, size_t len);  // 删除子串
+
     void erase(size_t pos);  // 删除字符
+
     string substr(size_t pos, size_t len) const;  // 截取子串
+
     bool empty() const;  // 判断是否为空字符串
+
     bool operator==(const string&) const;  // 判断是否相等
+
     bool operator!=(const string&) const;  // 判断是否不等
+
     bool operator<(const string&) const;  // 判断是否小于
+
     bool operator<=(const string&) const;  // 判断是否小于等于
+
     bool operator>(const string&) const;  // 判断是否大于
+
     bool operator>=(const string&) const;  // 判断是否大于等于
 };
 
@@ -68,15 +103,18 @@ string::string(const char* str = "") : size_(getlen(str)), capacity_(size_) {
     memcpy(data_, str, size_);          // 将 char* 字符串交给 string 类托管，向上一层封装
 }
 
+
 string::string(const char* str, size_t len) : size_(len), capacity_(len) {
     data_ = new char[capacity_];
     memcpy(data_, str, size_);
 }
 
+
 string::string(const string& str) {
     string temp(str.data_);      // 调用通用构造函数
     swap(temp);                  // 深拷贝
 }
+
 
 string::~string() {
     if (data_) {
@@ -86,28 +124,34 @@ string::~string() {
     }
 }
 
+
 void string::swap(string& str) {
     std::swap(data_, str.data_);
     std::swap(size_, str.size_);
     std::swap(capacity_, str.capacity_);
 }
 
+
 string& string::operator=(string& str) {
     swap(str);
     return *this;
 }
 
+
 char& string::operator[](size_t index) {
     return data_[index];
 }
+
 
 size_t string::find(const char* str, size_t pos) {
     return strstr(data_ + pos, str) - data_;
 }
 
+
 size_t string::find_first_of(const char* str, size_t pos) {
     return strpbrk(data_ + pos, str) - data_;
 }
+
 
 size_t string::find_last_of(const char* str, size_t pos) {
     const char* p = data_ + pos;
@@ -119,6 +163,7 @@ size_t string::find_last_of(const char* str, size_t pos) {
     return q - data_;
 }
 
+
 size_t string::find_first_not_of(const char* str, size_t pos) {
     const char* p = data_ + pos;
     while (*p && strchr(str, *p)) {
@@ -126,6 +171,7 @@ size_t string::find_first_not_of(const char* str, size_t pos) {
     }
     return p - data_;
 }
+
 
 size_t string::find_last_not_of(const char* str, size_t pos) {
     const char* p = data_ + pos;
