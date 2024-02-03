@@ -4,6 +4,7 @@
 #include <cstring>
 #include <algorithm>
 #include <stdexcept>
+#include <sstream>
 
 namespace magicstl {
 
@@ -74,13 +75,39 @@ public:
 
 //	template <typename T> auto insert(size_t pos, const T&) -> string&;
 
-	char& operator[](size_t index);         // 下标运算符
+	const char& operator[](const size_t index) const;         // 下标运算符
 
+	// const auto operator[](const char* key) const;  // 字典查找
+	/* string str = "hello world";
+	str["hello"] " world"  // 字典查找 */
+
+	string& operator=(const string& str);  // 赋值运算符
+
+	string& operator=(const long long& value); 
+
+	string& operator<<(const string& str);  // 左移运算符
+
+	string& operator+(const string& str);
 };
 
 /* ******************************************************************************************* */
 /* **************************** Implementation of class member functions ********************* */
 /* ******************************************************************************************* */
+
+/*  全局输入输出函数 */
+std::ostream& operator<<(std::ostream& os, const string& str) {
+	os << str.data();
+	return os;
+}
+
+std::istream& operator>>(std::istream& is, string& str) {
+	char _sRead[0x1FF] {};   // 缓冲区
+	is >> _sRead;;
+	str = _sRead;
+	return is;
+}
+/*  结束全局输入输出函数 */
+
 
 string::string() : size_(0), capacity_(1) {
 	data_ = new char[capacity_];
@@ -242,9 +269,39 @@ template <typename T> auto string::insert(size_t pos, const T& value) -> string&
 }
 */
 
-char& string::operator[](size_t index) {
+const char& string::operator[](const size_t index) const{
 	if (index > size_) throw std::logic_error(std::string("The access array is out of the index"));
 	return data_[index];
+}
+
+string& string::operator=(const string &str) {
+	if (this == &str) return *this;
+	string temp(str.data_);
+	swap(temp);
+	return *this;
+}
+
+string& string::operator=(const long long& value) {
+	string temp(std::to_string(value));
+	swap(temp);
+	return *this;
+}
+
+string& string::operator<<(const string& str) {   // 注意 字符串结尾 \0 也算一个字符 
+	unsigned short slen = getlen(str.data_);
+	slen = size_ + slen - 1;
+	if (size_ + slen >= capacity_) recapacity(capacity_ * 2 + slen); // 扩容
+	memcpy(data_ + size_ -1, str.data_, slen - size_ + 1);
+	size_ = slen;
+	return *this;
+}
+
+string& string::operator+(const string& str) {
+	/*
+	string temp(*this);
+	temp << str;
+	return temp; */
+	return *this << str;
 }
 
 
