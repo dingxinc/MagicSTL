@@ -1,334 +1,252 @@
 #ifndef STRING_H__
 #define STRING_H__
 
-#include <string.h>
+#include <cstring>
 #include <algorithm>
+#include <stdexcept>
 
 namespace magicstl {
 
 class string {
 private:
-    char*  data_;
-    size_t size_;
-    size_t capacity_;
+	char*  data_;      // 值
+	size_t size_;      // 大小
+	size_t capacity_;  // 容量
 
-    unsigned short getlen(const char* str) const {
-        unsigned short len = 0;
-        for (; str[len++]; );
-        return len;
-    }
+	unsigned short getlen(const char* str) const {
+		unsigned short len = 0;
+		for (; str[len++]; );
+		return len;
+	}
 
 public:
-    string(const char* str);    // 通用构造函数
+	string();                    // 空构造函数
 
-    string(const char* str, size_t len);
+	string(const char*);         // 通用构造函数
 
-    string(const string&);           // 拷贝构造函数
+	string(const string&);       // 拷贝构造函数
 
-    string& operator=(string&);      // 赋值运算符
+	string(const char*, size_t);
 
-    ~string();
+	~string();                   // 析构函数
 
-    char& operator[](size_t index);  // 下标运算符
+	void swap(string&);          // 深拷贝
 
-    void swap(string&);              // 深拷贝
+	char* begin() const;               // 迭代器
 
-    size_t find(const char* str);  // 查找子串
+	char* end() const;
 
-    size_t count(const char* str, size_t pos, size_t n);  // 统计子串出现次数
+	const char* data() const;
 
-    size_t size() const;  // 获取字符串长度
+	size_t size() const;
 
-    size_t capacity() const;  // 获取字符串容量
+	size_t capacity() const;
 
-    const char* data() const;  // 获取字符串指针
+	void recapacity(size_t newcapacity_);   // 调整字符串大小
 
-    void resize(size_t new_size);  // 调整字符串长度
+	void clear();                           // 清空字符串
 
-    void clear();  // 清空字符串
+	void push_back(char ch);                // 追加字符
 
-    void push_back(char ch);  // 追加字符
+	void pop_back();                        // 删除最后一个字符
 
-    void pop_back();  // 删除最后一个字符
+	void push_front(char ch);               // 追加到前面
 
-    void assign(const char* str);  // 赋值字符串
+	void pop_front();                       // 删除第一个字符
 
-    void insert(size_t pos, const char* str);  // 插入字符串
+	void erase(size_t pos, size_t len);     // 删除字串
 
-    void insert(size_t pos, const char* str, size_t len);  // 插入字符串
+	void erase(size_t pos);                 // 删除字符
 
-    void insert(size_t pos, char ch);  // 插入字符
+	bool empty() const;
 
-    void erase(size_t pos, size_t len);  // 删除子串
+	string substr(size_t pos, size_t len);  // 截取字串
 
-    void erase(size_t pos);  // 删除字符
+	size_t find(const char*);               // 查找字串
 
-    string substr(size_t pos, size_t len) const;  // 截取子串
+	size_t find(string&);                   // 查找字串
 
-    bool empty() const;  // 判断是否为空字符串
+	size_t count(const char*, size_t pos, size_t n);  // 统计字串出现的次数
 
-    bool operator==(const string&) const;  // 判断是否相等
+	size_t count(string&, size_t pos, size_t n);      // 统计字串出线的次数
 
-    bool operator!=(const string&) const;  // 判断是否不等
+	// template <typename T> auto to_string(const T& value) -> string;
 
-    bool operator<(const string&) const;  // 判断是否小于
+//	template <typename T> auto insert(size_t pos, const T&) -> string&;
 
-    bool operator<=(const string&) const;  // 判断是否小于等于
+	char& operator[](size_t index);         // 下标运算符
 
-    bool operator>(const string&) const;  // 判断是否大于
-
-    bool operator>=(const string&) const;  // 判断是否大于等于
-
-    string& operator<<(const string& str);  // 左移运算符
-
-    string& operator>>(string& str);  // 右移运算符
-
-    string& operator+=(const string& str);  // 加等于运算符
-
-    string& operator-=(const string& str);  // 减等于运算符
 };
 
 /* ******************************************************************************************* */
 /* **************************** Implementation of class member functions ********************* */
 /* ******************************************************************************************* */
 
-string::string(const char* str) : size_(getlen(str)), capacity_(size_) {
-    data_ = new char[capacity_];
-    memcpy(data_, str, size_);          // 将 char* 字符串交给 string 类托管，向上一层封装
+string::string() : size_(0), capacity_(1) {
+	data_ = new char[capacity_];
+	data_[size_] = '\0';
 }
 
-
-string::string(const char* str, size_t len) : size_(len), capacity_(len) {
-    data_ = new char[capacity_];
-    memcpy(data_, str, size_);
+string::string(const char* str) : size_(strlen(str)), capacity_(getlen(str)) {
+	data_ = new char[capacity_];
+	strcpy_s(data_, capacity_, str);
 }
-
 
 string::string(const string& str) {
-    string temp(str.data_);      // 调用通用构造函数
-    swap(temp);                  // 深拷贝
+	string temp(str.data_);       // 调用 通用构造函数
+	swap(temp);                   // 深拷贝
 }
 
+string::string(const char* str, size_t len) : size_(len), capacity_(len) {
+	data_ = new char[capacity_];
+	strcpy(data_, str);
+}
 
 string::~string() {
-    if (data_) {
-        delete [] data_;
-        data_ = nullptr;
-        size_ = capacity_ = 0;
-    }
+	if (data_) {
+		delete[] data_;
+		data_ = nullptr;
+		size_ = capacity_ = 0;
+	}
 }
-
 
 void string::swap(string& str) {
-    std::swap(data_, str.data_);
-    std::swap(size_, str.size_);
-    std::swap(capacity_, str.capacity_);
+	std::swap(data_, str.data_);
+	std::swap(size_, str.size_);
+	std::swap(capacity_, str.capacity_);
 }
 
-
-string& string::operator=(string& str) {
-    swap(str);
-    return *this;
+char* string::begin() const {
+	return data_;
 }
 
-
-char& string::operator[](size_t index) {
-    return data_[index];
+char* string::end() const {
+	return data_ + size_;
 }
 
-
-size_t string::find(const char* str) {
-    return strstr(data_, str) - data_;
+const char* string::data() const {
+	return data_;
 }
-
-
-size_t string::count(const char* str, size_t pos, size_t n) {
-    const char* p = data_ + pos;
-    size_t count = 0;
-    while ((p = strstr(p, str)) != nullptr) {
-        ++count;
-        p += n;
-    }
-    return count;
-}
-
 
 size_t string::size() const {
-    return size_;
+	return size_;
 }
 
 size_t string::capacity() const {
-    return capacity_;
+	return capacity_;
 }
 
-
-const char* string::data() const {
-    return data_;
+void string::recapacity(size_t newcapacity_) {
+	if (newcapacity_ > capacity_) {
+		char* newdata_ = new char[newcapacity_];  // 扩容
+		strcpy_s(newdata_, capacity_, data_);     // 拷贝旧数据
+		delete[] data_;                           // 删除旧数据
+		data_ = newdata_;                         // 指向新数据
+		capacity_ = newcapacity_;                 // 更新容量
+	}
+	size_ = strlen(data_);                         // 更新长度
 }
-
-
-void string::resize(size_t new_size) {
-    if (new_size > capacity_) {
-        char* new_data = new char[new_size];       // 扩容
-        memcpy(new_data, data_, size_);// 拷贝旧数据
-        delete [] data_;                           // 删除旧数据
-        data_ = new_data;                          // 指向新数据
-        capacity_ = new_size;                       // 更新容量
-    }
-    size_ = new_size;    // 更新长度
-}
-
 
 void string::clear() {
-    size_ = 0;
+	delete[] data_;
+	data_ = nullptr;
+	size_ = 0;
 }
-
 
 void string::push_back(char ch) {
-    if (size_ == capacity_) {
-        resize(capacity_ * 2);  // 扩容
-    }
-    data_[size_++] = ch;
+	if (size_ + sizeof(ch) == capacity_) recapacity(capacity_ * 2);   // 扩容
+	data_[size_++] = ch;
+	data_[size_] = '\0';
 }
-
 
 void string::pop_back() {
-    --size_;
+	data_[--size_] = '\0';
 }
 
-
-void string::assign(const char* str) {
-    string temp(str);
-    swap(temp);
+void string::push_front(char ch) {
+	if (size_ == capacity_) recapacity(capacity_ * 2);   // 扩容
+//	insert(0, ch);
 }
 
-
-void string::insert(size_t pos, const char* str) {
-    insert(pos, str, getlen(str));
+void string::pop_front() {
+	memmove_s(data_, size_--, data_ + 1, size_);
+	data_[size_--] = '\0';  // 注意和 pop_back() 中 size_ 变量的区别，i++ 和 ++i 的区别
 }
-
-
-void string::insert(size_t pos, const char* str, size_t len) {
-    if (len == 0) {
-        return;
-    }
-    if (size_ + len > capacity_) {
-        resize(size_ + len);
-    }
-    memmove(data_ + pos + len, data_ + pos, size_ - pos);
-    memcpy(data_ + pos, str, len);
-    size_ += len;
-}
-
-
-void string::insert(size_t pos, char ch) {
-    insert(pos, &ch, 1);
-}
-
 
 void string::erase(size_t pos, size_t len) {
-    if (len == 0) {
-        return;
-    }
-    memmove(data_ + pos, data_ + pos + len, size_ - pos - len);
-    size_ -= len;
+	if (len == 0) return;
+	if (pos < 0 || pos > capacity_) throw std::logic_error(std::string("Input pos error."));
+	memmove_s(data_ + pos, size_ - pos - len, data_ + pos + len, size_ - pos - len);
+   	size_ -= len;
+	data_[size_] = '\0';
 }
-
 
 void string::erase(size_t pos) {
-    erase(pos, 1);
+	erase(pos, 1);      // 删除一个字符
 }
-
-
-string string::substr(size_t pos, size_t len) const {
-    if (pos > size_) {
-        pos = size_;
-    }
-    if (pos + len > size_) {
-        len = size_ - pos;
-    }
-    return string(data_ + pos, len);
-}
-
 
 bool string::empty() const {
-    return size_ == 0;
+	return size_ == 0;
+}
+
+string string::substr(size_t pos, size_t len) {
+	if (pos > size_) pos = size_;
+	if (pos + len > size_) len = size_ - pos;
+	return string(data_ + pos, len);
+}
+
+size_t string::find(const char* str) {
+	return strstr(data_, str) - data_;
+}
+
+size_t string::find(string& str) {
+	return find(str.data_);
+}
+
+size_t string::count(const char* str, size_t pos, size_t n) {
+	const char* p = data_ + pos;
+	size_t count = 0;
+	while ((p == strstr(p, str)) != NULL) {
+		++count;
+		p += n;
+	}
+	return count;
+}
+
+size_t string::count(string& str, size_t pos, size_t n) {
+	return count(str.data_, pos, n);
+}
+
+/*
+template <typename T> auto string::to_string(const T& value) -> string {
+	std::ostringstream os;
+	os << value;
+	return os.str();
 }
 
 
-bool string::operator==(const string& str) const {
-    return size_ == str.size_ && memcmp(data_, str.data_, size_) == 0;
+template <typename T> auto string::insert(size_t pos, const T& value) -> string& {
+	if (pos < 0 || pos > capacity_) throw std::logic_error("Input pos error.");
+	auto len = sizeof(to_string(value));
+	if (size_ + len >= capacity_) recapacity(capacity_ * 2 + len); // 扩容
+	for (int i = size_ - 1; i > pos; --i) {
+		data_[i + len] = data_[i];
+	}
+	string temp(to_string(value));
+	for (auto it = begin(); it != end(); ++it) {
+		data_[pos++] = it;
+	}
+	size_ += len;
+	data_[size_] = '\0';
+	return *this;
+}
+*/
+
+char& string::operator[](size_t index) {
+	if (index > size_) throw std::logic_error(std::string("The access array is out of the index"));
+	return data_[index];
 }
 
 
-bool string::operator!=(const string& str) const {
-    return !(*this == str);
-}
-
-
-bool string::operator<(const string& str) const {
-    return std::lexicographical_compare(data_, data_ + size_, str.data_, str.data_ + str.size_);
-}
-
-
-bool string::operator<=(const string& str) const {
-    return *this < str || *this == str;
-}
-
-
-bool string::operator>(const string& str) const {
-    return !(*this <= str);
-}
-
-
-bool string::operator>=(const string& str) const {
-    return !(*this < str);
-}
-
-
-string& string::operator<<(const string& str) {
-    // insert(size_, str.data_, str.size_);
-    // return *this;    // 左移运算符返回左侧对象 
-    unsigned short len = getlen(str.data_);
-    if (size_ + len > capacity_) {
-        resize(size_ + len);
-    }
-    memcpy(data_ + size_, str.data_, len);
-    size_ += len;
-    return *this;
-}
-
-
-string& string::operator>>(string& str) {
-    // str = substr(0, size_);
-    // resize(0);
-    // return str;    // 右移运算符返回右侧对象
-    str = *this;
-    resize(0);
-    return str;
-}
-
-string& string::operator+=(const string& str) {
-    // insert(size_, str.data_, str.size_);
-    // return *this;    // 加等于运算符返回左侧对象
-    unsigned short len = getlen(str.data_);
-    if (size_ + len > capacity_) {   // 扩容
-        resize(size_ + len);
-    }
-    memcpy(data_ + size_, str.data_, len);   // 拷贝新数据
-    size_ += len;
-    return *this;   
-}
-
-
-string& string::operator-=(const string& str) {
-    size_t pos = find(str.data_);
-    if (pos != string::npos) {
-        erase(pos, str.size_);
-    }
-    return *this;
-}     
-
-}
-
+} // namespace magicstl
 #endif // !STRING_H__

@@ -4,20 +4,36 @@
 namespace mstl = magicstl;
 
 int main() {
-    mstl::string s1("Hello, world!");
-    s1 << " This is a test string.";
-    s1 << " This is another test string.";
-    std::cout << s1.data() << std::endl;
-    size_t pos = s1.find("orld");
-    std::cout << "Found world at position " << pos << std::endl;
-    s1.resize(100);
-    std::cout << "Resized to " << s1.size() << " characters" << "capacity = " << s1.capacity() << std::endl;
+	mstl::string s1;
+	mstl::string s2("hello world");
+	std::cout << s2.data() << " " << s2.size() << " " << s2.capacity() << '\n';
 
-    mstl::string s2("hahahahahahahahaha");
-    size_t count = s2.count("haha", 2, 4);
-    std::cout << "count = " << count << std::endl;
+	s2.erase(2, 3);
+	std::cout << s2.data() << " " << s2.size() << " " << s2.capacity() << '\n';
 
 
-    // mstl::string s2 = "Goodbye, world!";
-    return 0;
+	mstl::string s3(s2);
+	std::cout << s3.data() << " " << s3.size() << " " << s3.capacity() << '\n';
+	
+	s3.recapacity(20);
+	std::cout << s3.data() << " " << s3.size() << " " << s3.capacity() << '\n';
+
+	s3.clear();
+	std::cout << s3.size() << " " << s3.capacity() << '\n';
+
+	s2.push_back('c');
+	std::cout << s2.data() << " " << s2.size() << " " << s2.capacity() << '\n';
+
+	s2.pop_back();
+	std::cout << s2.data() << " " << s2.size() << " " << s2.capacity() << '\n';
+
+	s2.pop_front();
+	std::cout << s2.data() << " " << s2.size() << " " << s2.capacity() << '\n';
+	
+	std::cout << s2[2] << s2[3] << std::endl;
+
+	s2.erase(3);
+	std::cout << s2.data() << " " << s2.size() << " " << s2.capacity() << '\n';
+
+	return 0;
 }
